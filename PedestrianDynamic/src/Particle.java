@@ -12,6 +12,8 @@ public class Particle {
     private double angle;
     private final double radius;
     private final double mass;
+    private final double desiredAngle;
+
 
     private final List<Particle> neighbors;
 
@@ -22,10 +24,10 @@ public class Particle {
         this.speed = speed;
         this.angle = angle;
         this.radius = radius;
-        this.neighbors = new ArrayList<>();
         this.mass = mass;
+        this.neighbors = new ArrayList<>();
+        this.desiredAngle = random() * 2 * PI;
     }
-
     public static Particle cloneOf(Particle p) {
         return new Particle(p.id, p.x, p.y, p.speed, p.angle, p.radius, p.mass);
     }
@@ -74,4 +76,36 @@ public class Particle {
         return String.format(Locale.US,"%d,%f,%f,%f,%f,%f\n", id, x, y, vx(), vy(), radius);
     }
 
+
+    public List<Particle> getNeighbors() {
+        return neighbors;
+    }
+
+    public double getDesiredAngle() {
+        return desiredAngle;
+    }
+
+    public double getRadius() {
+        return radius;
+    }
+
+    public double getAngle() {
+        return angle;
+    }
+
+    public double getSpeed() {
+        return speed;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public int getId() {
+        return id;
+    }
 }

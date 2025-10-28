@@ -24,10 +24,10 @@ public class SFM {
         double g = overlap; // g(x) = max(0, x)
 
         // Velocidades
-        double vix = cos(i.angle()) * i.speed();
-        double viy = sin(i.angle()) * i.speed();
-        double vjx = cos(j.angle()) * j.speed();
-        double vjy = sin(j.angle()) * j.speed();
+        double vix = cos(i.getAngle()) * i.getSpeed();
+        double viy = sin(i.getAngle()) * i.getSpeed();
+        double vjx = cos(j.getAngle()) * j.getSpeed();
+        double vjy = sin(j.getAngle()) * j.getSpeed();
 
         double dvx = vjx - vix;
         double dvy = vjy - viy;
@@ -43,16 +43,20 @@ public class SFM {
         return new double[]{fx, fy};
     }
 
-    public static double[] drivingForce(Particle i, double targetAngle) {
-        double desiredVx = vd * cos(targetAngle);
-        double desiredVy = vd * sin(targetAngle);
 
-        double vix = cos(i.angle()) * i.speed();
-        double viy = sin(i.angle()) * i.speed();
+    public static double[] drivingForce(Particle i) {
+        double desiredVx = vd * cos(i.getDesiredAngle());
+        double desiredVy = vd * sin(i.getDesiredAngle());
+
+        double vix = cos(i.getAngle()) * i.getSpeed();
+        double viy = sin(i.getAngle()) * i.getSpeed();
 
         double fx = i.getMass() * ((desiredVx - vix) / tau);
         double fy = i.getMass() * ((desiredVy - viy) / tau);
 
         return new double[]{fx, fy};
     }
+
+
+
 }
