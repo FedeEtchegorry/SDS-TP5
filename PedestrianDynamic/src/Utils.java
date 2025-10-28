@@ -1,8 +1,6 @@
 import java.util.concurrent.ThreadLocalRandom;
 
 public final class Utils {
-    private Utils() {}
-
     /** [0,1) */
     public static double randDouble01() {
         return ThreadLocalRandom.current().nextDouble();
@@ -30,4 +28,7 @@ public final class Utils {
         return m;
     }
 
+    private Utils() {
+        throw new IllegalStateException(this.getClass().getName() + " cannot be instantiated.");
+    }
 }

@@ -14,7 +14,6 @@ public class Particle {
     private final double mass;
     private final double desiredAngle;
 
-
     private final List<Particle> neighbors;
 
     public Particle(int id, double x, double y, double speed, double angle, double radius, double mass) {
@@ -113,4 +112,23 @@ public class Particle {
     public int getId() {
         return id;
     }
+
+    public void setPosition(double x, double y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
+    public void setAngle(double angle) {
+        this.angle = angle;
+    }
+
+    public void setVelocity(double vx, double vy) {
+        setSpeed(sqrt(vx*vx + vy*vy));
+        setAngle(atan2(vy, vx));
+    }
+
 }

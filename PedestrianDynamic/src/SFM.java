@@ -2,7 +2,7 @@ import java.util.List;
 
 import static java.lang.Math.*;
 
-public class SFM {
+public final class SFM {
 
     private static final double KN = 1.2e5;   // [N/m] fuerza normal (contacto)
     private static final double KT = 2.4e5;   // [kg/m/s] fricción tangencial
@@ -73,5 +73,9 @@ public class SFM {
         double fy = i.getMass() * ((desiredVy - viy) / TAU);
 
         return new double[]{fx, fy};
+    }
+
+    private SFM() {
+        throw new IllegalStateException(this.getClass().getName() + " cannot be instantiated.");
     }
 }
