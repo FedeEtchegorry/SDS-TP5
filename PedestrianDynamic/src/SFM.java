@@ -1,3 +1,5 @@
+import java.util.List;
+
 import static java.lang.Math.*;
 
 public class SFM {
@@ -7,7 +9,24 @@ public class SFM {
     private static final double tau = 0.5;    // [s] tiempo de relajación
     private static final double vd = 1.7;     // [m/s] velocidad deseada
 
-    public static double[] contactForce(Particle i, Particle j) {
+    public static double[][] force(List<Particle> particles) {
+
+        double[] fx = new double[particles.size()];
+        double[] fy = new double[particles.size()];
+
+        for (int i = 0; i < particles.size(); i++) {
+            for (int j = 0; j < particles.size(); j++) {
+                if (i == j) continue;
+                fx[i] += contactForce(particles.get(i), particles.get(j))[0];
+                fy[i] += contactForce(particles.get(i), particles.get(j))[1];
+            }
+            fx[i] += drivingForce(particles.get(i))[0];
+        }
+
+        return new double[][]{fx, fy};
+    }
+
+    private static double[] contactForce(Particle i, Particle j) {
         double dx = j.x() - i.x();
         double dy = j.y() - i.y();
         double dij = hypot(dx, dy);
@@ -43,8 +62,7 @@ public class SFM {
         return new double[]{fx, fy};
     }
 
-
-    public static double[] drivingForce(Particle i) {
+    private static double[] drivingForce(Particle i) {
         double desiredVx = vd * cos(i.getDesiredAngle());
         double desiredVy = vd * sin(i.getDesiredAngle());
 
@@ -56,7 +74,4 @@ public class SFM {
 
         return new double[]{fx, fy};
     }
-
-
-
 }
