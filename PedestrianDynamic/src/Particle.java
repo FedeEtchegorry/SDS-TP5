@@ -81,6 +81,11 @@ public class Particle {
         return neighbors;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof Particle && getId() == ((Particle) obj).getId();
+    }
+
     public double getDesiredAngle() {
         return desiredAngle;
     }

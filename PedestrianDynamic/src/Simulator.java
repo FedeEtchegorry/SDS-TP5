@@ -34,11 +34,11 @@ public class Simulator {
                     nextWriteTime+=writeInterval;
                 }
                 grid.findNeighbors();
-                for (Particle p: particles){
+                for (Particle p: particles){;
 //                    TODO: agregar fuerzas e integradores
 //                    if (thereIsCollisionWithCenterParticle()) out.writeStepForCenterCollision(p);
 //                    p.calculateForces();
-                    p.update(grid.getL());
+//                    p.update(grid.getL());
                 }
                 t+=deltaT;
             }
