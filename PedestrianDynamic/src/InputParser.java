@@ -29,10 +29,11 @@ public class InputParser {
                 Particle particle = new Particle(id, x, y, v, angle, radius, mass);
                 particles.add(particle);
             }
-            if (particles.size() != particles_amount) {
+            if (particles.size() != particles_amount + 1) { // - 1 por el obstáculo
                 throw new IllegalArgumentException("Number of particles does not match the expected amount");
             }
         } catch (Exception e) {
+            System.out.println("N: "+ particles_amount + ", lines: "+ particles.size());
             e.printStackTrace();
         }
         return  particles;

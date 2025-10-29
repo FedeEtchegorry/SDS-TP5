@@ -9,32 +9,19 @@ public class ParticlesGenerator {
     private final int particleCount;
     private final double boardSize;
     private final double speed;
-    private final double radius;
+    private final double rMin;
+    private final double rMax;
     private final double mass;
     private static final String OUTPUT_PATH = "./inputs";
 
-    public ParticlesGenerator(int particleCount, double boardSize, double speed, double radius, double mass) {
+    public ParticlesGenerator(int particleCount, double boardSize, double speed, double rMin, double rMax, double mass) {
         this.particleCount = particleCount;
         this.boardSize = boardSize;
         this.speed = speed;
-        this.radius = radius;
+        this.rMin = rMin;
+        this.rMax = rMax;
         this.mass = mass;
     }
-
-//    public boolean checkOverlap(Particle p1, Particle p2) {
-//        double dx = p1.getX() - p2.getX();
-//        double dy = p1.getY() - p2.getY();
-//        double distance = Math.sqrt(dx * dx + dy * dy);
-//        return distance < (p1.getRadius() + p2.getRadius());
-//    }
-//
-//    public boolean checkCollision(Particle[] particles, Particle new_particle, int created_particles) {
-//        for (int i = 0; i < created_particles; i++) {
-//            if (checkOverlap(particles[i], new_particle)) return true;
-//        }
-//        return false;
-//    }
-
 
     public void generateInputs(int iteration) throws IOException {
         String dirPath = OUTPUT_PATH + String.format("/N%04d", particleCount);
@@ -45,38 +32,53 @@ public class ParticlesGenerator {
             file.delete();
         }
         file.createNewFile();
-        int i = 0;
-        while (i < particleCount) {
+
+    // Obstáculo:
+        String center_particle_string = String.format(Locale.US,
+                "%d,%.17g,%.17g,%.17g,%.17g,%.17g,%.5f%n",
+                0, boardSize / 2, boardSize / 2, 0.0, 0.0, Grid.OBSTACLE_RADIUS, Double.MAX_VALUE);
+        Files.write(file.toPath(), center_particle_string.getBytes(), StandardOpenOption.APPEND);
+
+    // Partículas:
+        for (int i = 1; i <= particleCount; i++) {
+            double radius = rMin + Math.random() * (rMax - rMin);
             double x = Math.random() * (boardSize - 2 * radius) + radius;
             double y = Math.random() * (boardSize - 2 * radius) + radius;
             double angle = Math.random() * 2 * Math.PI;
-//            double vx = speed * Math.cos(angle);
-//            double vy = speed * Math.sin(angle);
-//            Particle new_particle = new Particle(i,x, y, speed, angle, radius, particleCount-1, mass);
-            String particle = String.format(Locale.US, "%d,%.17g,%.17g,%.17g,%.17g,%.17g,%.5f%n",i, x, y, speed, angle, radius, mass);
-            Files.write(file.toPath(), particle.getBytes(), StandardOpenOption.APPEND);
-            i++;
+            double vx = speed * Math.cos(angle);
+            double vy = speed * Math.sin(angle);
 
+            String particle = String.format(Locale.US,
+                    "%d,%.17g,%.17g,%.17g,%.17g,%.17g,%.5f%n",
+                    i, x, y, speed, angle, radius, mass);
+            Files.write(file.toPath(), particle.getBytes(), StandardOpenOption.APPEND);
         }
+
         System.out.println("File " + file.getName() + " created successfully.");
     }
 
-
     public static void main(String[] args) throws IOException {
+        if (args.length < 6) {
+            System.out.println("Usage: java ParticlesGenerator <N> <L> <speed> <rMin> <rMax> <iterations> <mass>");
+            return;
+        }
+
         int N = Integer.parseInt(args[0]);
         double L = Double.parseDouble(args[1]);
         double speed = Double.parseDouble(args[2]);
-        double radius = Double.parseDouble(args[3]);
-        int iterations = Integer.parseInt(args[4]);
-        int mass = Integer.parseInt(args[5]);
-        if (N <= 0 || L <= 0 || speed <= 0 || radius <= 0 || iterations <= 0) {
-            System.out.println("Error: Parameters should be: N, L, speed, radius, iterations, mass");
+        double rMin = Double.parseDouble(args[3]);
+        double rMax = Double.parseDouble(args[4]);
+        int iterations = Integer.parseInt(args[5]);
+        double mass = Double.parseDouble(args[6]);
+
+        if (N <= 0 || L <= 0 || speed <= 0 || rMin <= 0 || rMax <= 0 || iterations <= 0 || rMin > rMax) {
+            System.out.println("Error: invalid parameters.");
             return;
         }
-        ParticlesGenerator gen = new ParticlesGenerator(N, L, speed, radius, mass);
+
+        ParticlesGenerator gen = new ParticlesGenerator(N, L, speed, rMin, rMax, mass);
         for (int i = 0; i < iterations; i++) {
             gen.generateInputs(i);
         }
     }
 }
-

@@ -12,6 +12,8 @@ public class Grid {
     private final int M;
     private final double Rc;
     private final boolean periodicBorders;
+    public static final double OBSTACLE_RADIUS = 0.21;
+
 
     public Grid(double L, double Rc, int N, List<Particle> particles, boolean periodicBorders) {
         this.particles = particles;
