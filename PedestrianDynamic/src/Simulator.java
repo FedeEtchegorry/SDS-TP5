@@ -28,18 +28,21 @@ public class Simulator {
     }
     public void executeSimulation() throws IOException {
         try (OutputWriter out = OutputWriter.open(outputPath)){
-            while (t<maxT){
+
+
+            double[][][] gearR = new double[2][][];
+            double[][][] gearP = new double[2][][];
+
+            SFMIntegrator.initGear(particles, deltaT, gearR, gearP);
+
+            while (t<maxT)  {
                 if (t>=nextWriteTime){
                     out.writeStep(particles, t);
                     nextWriteTime+=writeInterval;
                 }
                 grid.findNeighbors();
-                for (Particle p: particles){;
-//                    TODO: agregar fuerzas e integradores
-//                    if (thereIsCollisionWithCenterParticle()) out.writeStepForCenterCollision(p);
-//                    p.calculateForces();
-//                    p.update(grid.getL());
-                }
+                SFMIntegrator.updateParticlesGear5(particles, deltaT, gearR, gearP, grid.getL());
+
                 t+=deltaT;
             }
         }
@@ -62,13 +65,9 @@ public class Simulator {
             return;
         }
         for (int i = 0; i < iterations; i++) {
-            InputParser parser = new InputParser(inputDir + "/N" + String.format("%04d", N) + "/input_N" + String.format("%04d", N) + "_" + String.format("%04d", i) + ".csv", N);
+            InputParser parser = new InputParser(inputDir + "/N" + String.format("%04d", N) +
+                    "/input_N" + String.format("%04d", N) + "_" + String.format("%04d", i) + ".csv", N);
             ArrayList<Particle> particles = parser.parseInputs();
-            System.out.println(particles.size());
-            if (particles.size() != N) {
-                System.out.println("Error: Number of particles does not match the expected amount");
-                return;
-            }
             String L_dir = String.format(Locale.US, "L%.3f", L);
             Path directory = Files.createDirectories(Path.of(outputDir, "N_" + N + "_" + L_dir));
             Path fileName = Path.of(directory + String.format("/output_N%d_%s_t%d_%s.csv", N, L_dir, maxT, String.format("%04d", i)));
