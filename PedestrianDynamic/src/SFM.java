@@ -14,7 +14,7 @@ public final class SFM {
         double[] fx = new double[particles.size()];
         double[] fy = new double[particles.size()];
 
-        for (Particle p1 : particles) {
+        for (Particle p1 : particles.subList(1, particles.size())) {
             for (Particle p2 : p1.neighbors()) {
                 if (p1.equals(p2)) continue;
                 fx[p1.getId()] += contactForce(particles.get(p1.getId()), particles.get(p2.getId()))[0];

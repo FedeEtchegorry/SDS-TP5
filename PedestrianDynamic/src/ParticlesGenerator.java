@@ -36,7 +36,7 @@ public class ParticlesGenerator {
     // Obstáculo:
         String center_particle_string = String.format(Locale.US,
                 "%d,%.17g,%.17g,%.17g,%.17g,%.17g,%.5f%n",
-                0, boardSize / 2, boardSize / 2, 0.0, 0.0, Grid.OBSTACLE_RADIUS, Double.MAX_VALUE);
+                0, boardSize / 2, boardSize / 2, 0.0, 0.0, Grid.OBSTACLE_RADIUS, mass);
         Files.write(file.toPath(), center_particle_string.getBytes(), StandardOpenOption.APPEND);
 
     // Partículas:
@@ -45,8 +45,8 @@ public class ParticlesGenerator {
             double x = Math.random() * (boardSize - 2 * radius) + radius;
             double y = Math.random() * (boardSize - 2 * radius) + radius;
             double angle = Math.random() * 2 * Math.PI;
-            double vx = speed * Math.cos(angle);
-            double vy = speed * Math.sin(angle);
+//            double vx = speed * Math.cos(angle);
+//            double vy = speed * Math.sin(angle);
 
             String particle = String.format(Locale.US,
                     "%d,%.17g,%.17g,%.17g,%.17g,%.17g,%.5f%n",

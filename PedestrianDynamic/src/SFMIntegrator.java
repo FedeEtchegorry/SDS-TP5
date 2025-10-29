@@ -14,7 +14,7 @@ public final class SFMIntegrator {
         p[1] = new double[6][N];
 
         // Posiciones y velocidades iniciales
-        for (int i = 0; i < N; i++) {
+        for (int i = 1; i < N; i++) {
             Particle pi = particles.get(i);
             r[0][0][i] = pi.getX();
             r[1][0][i] = pi.getY();
@@ -26,7 +26,7 @@ public final class SFMIntegrator {
 
         // Aceleraciones iniciales = F/m
         double[][] forces = SFM.force(particles);
-        for (int i = 0; i < N; i++) {
+        for (int i = 1; i < N; i++) {
             Particle pi = particles.get(i);
             double fx = forces[0][i];
             double fy = forces[1][i];
@@ -56,7 +56,7 @@ public final class SFMIntegrator {
         final double C5 = GearCoefficients.C5;
 
         // --- PREDICTOR ---
-        for (int i = 0; i < N; i++) {
+        for (int i = 1; i < N; i++) {
             for (int d = 0; d < 2; d++) { // 0:x, 1:y
                 double r0 = r[d][0][i];
                 double r1 = r[d][1][i];
@@ -75,7 +75,7 @@ public final class SFMIntegrator {
         }
 
         // Actualizar posiciones predichas en las partículas
-        for (int i = 0; i < N; i++) {
+        for (int i = 1; i < N; i++) {
             Particle pi = particles.get(i);
             pi.setPosition(Utils.fmodPositive(p[0][0][i], boardSize),
                            Utils.fmodPositive(p[1][0][i], boardSize));
@@ -86,7 +86,7 @@ public final class SFMIntegrator {
         double[] R2x = new double[N];
         double[] R2y = new double[N];
 
-        for (int i = 0; i < N; i++) {
+        for (int i = 1; i < N; i++) {
             Particle pi = particles.get(i);
             double axPred = p[0][2][i];
             double ayPred = p[1][2][i];
@@ -103,7 +103,7 @@ public final class SFMIntegrator {
         double invDt4 = invDt3 * invDt;
         double invDt5 = invDt4 * invDt;
 
-        for (int i = 0; i < N; i++) {
+        for (int i = 1; i < N; i++) {
             for (int d = 0; d < 2; d++) {
                 double R2 = (d == 0) ? R2x[i] : R2y[i];
 
