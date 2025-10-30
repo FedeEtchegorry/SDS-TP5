@@ -3,6 +3,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class ParticlesGenerator {
@@ -33,26 +35,56 @@ public class ParticlesGenerator {
         }
         file.createNewFile();
 
+        List<Particle> particles = new ArrayList<>();
+
     // Obstáculo:
+        Particle obstacle = new Particle(0, boardSize / 2, boardSize / 2, 0.0, 0.0, Grid.OBSTACLE_RADIUS, mass);
         String center_particle_string = String.format(Locale.US,
                 "%d,%.17g,%.17g,%.17g,%.17g,%.17g,%.5f%n",
-                0, boardSize / 2, boardSize / 2, 0.0, 0.0, Grid.OBSTACLE_RADIUS, mass);
+                obstacle.id(), obstacle.x(), obstacle.y(), obstacle.getSpeed(), obstacle.getAngle(), obstacle.getRadius(), obstacle.getMass());
         Files.write(file.toPath(), center_particle_string.getBytes(), StandardOpenOption.APPEND);
+        particles.add(obstacle);
 
-    // Partículas:
+        // Partículas:
         for (int i = 1; i <= particleCount; i++) {
             double radius = rMin + Math.random() * (rMax - rMin);
-            double x = Math.random() * (boardSize - 2 * radius) + radius;
-            double y = Math.random() * (boardSize - 2 * radius) + radius;
             double angle = Math.random() * 2 * Math.PI;
-//            double vx = speed * Math.cos(angle);
-//            double vy = speed * Math.sin(angle);
+            double x, y;
+            Particle p;
 
-            String particle = String.format(Locale.US,
+            int tries = 0;
+            boolean valid;
+            do {
+                x = Math.random() * (boardSize - 2 * radius) + radius;
+                y = Math.random() * (boardSize - 2 * radius) + radius;
+
+                p = new Particle(i, x, y, speed, angle, radius, mass);
+                valid = true;
+
+                for (Particle other : particles) {
+                    double dx = p.x() - other.x();
+                    double dy = p.y() - other.y();
+                    double dist2 = dx * dx + dy * dy;
+                    double minDist = p.getRadius() + other.getRadius();
+                    if (dist2 < minDist * minDist) {
+                        valid = false;
+                        break;
+                    }
+                }
+                tries++;
+                if (tries > 10000) {
+                    throw new RuntimeException("No se pudo ubicar la partícula " + i + " sin superposición después de 10000 intentos");
+                }
+            } while (!valid);
+
+            particles.add(p);
+
+            String particleStr = String.format(Locale.US,
                     "%d,%.17g,%.17g,%.17g,%.17g,%.17g,%.5f%n",
                     i, x, y, speed, angle, radius, mass);
-            Files.write(file.toPath(), particle.getBytes(), StandardOpenOption.APPEND);
+            Files.write(file.toPath(), particleStr.getBytes(), StandardOpenOption.APPEND);
         }
+
 
         System.out.println("File " + file.getName() + " created successfully.");
     }
