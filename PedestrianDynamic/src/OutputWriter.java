@@ -44,6 +44,18 @@ public class OutputWriter implements AutoCloseable {
         bw.write(sb.toString());
     }
 
+    public void writeCollisionWithCenterParticle(List<Particle> particles, double time) throws IOException {
+        if (!particles.isEmpty()) {
+            sb.setLength(0);
+            fmt.format("%.16g ", time);
+            for (Particle p : particles) {
+                fmt.format("%d ", p.getLogicId());
+            }
+            fmt.format("%n");
+            bw.write(sb.toString());
+        }
+    }
+
 
     @Override
     public void close() throws IOException {

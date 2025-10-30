@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class Simulator {
@@ -27,8 +28,9 @@ public class Simulator {
 
     }
     public void executeSimulation() throws IOException {
-        try (OutputWriter out = OutputWriter.open(outputPath)){
-
+        Path analysisPath = Path.of(outputPath.toString().replace(".csv", "_collisions.csv"));
+        try (OutputWriter out = OutputWriter.open(outputPath);
+            OutputWriter analysisOut = OutputWriter.open(analysisPath)) {
 
             double[][][] gearR = new double[2][][];
             double[][][] gearP = new double[2][][];
@@ -37,7 +39,9 @@ public class Simulator {
 
             while (t<maxT)  {
                 if (t>=nextWriteTime){
+                    List<Particle> particlesThatClashedFixedParticles = getParticlesThatClashedFixedParticle(particles);
                     out.writeStep(particles, t);
+                    analysisOut.writeCollisionWithCenterParticle(particlesThatClashedFixedParticles, t);
                     nextWriteTime+=writeInterval;
                 }
                 grid.findNeighbors();
@@ -46,6 +50,18 @@ public class Simulator {
                 t+=deltaT;
             }
         }
+    }
+
+    public List<Particle> getParticlesThatClashedFixedParticle(List<Particle> pi) {
+        List<Particle> particlesThatClashedFixed = new ArrayList<>();
+        //          Check if overlaps with fixed particle
+        for (Particle p : pi) {
+            if (!p.getCollisionWithCenterHasHappened() && p.overlapsWithParticle(particles.getFirst())){
+                p.setCollisionWithCenterHasHappened();
+                particlesThatClashedFixed.add(p);
+            }
+        }
+        return particlesThatClashedFixed;
     }
 
 

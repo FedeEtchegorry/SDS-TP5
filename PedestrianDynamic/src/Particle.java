@@ -1,15 +1,18 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 import static java.lang.Math.*;
 
 public class Particle {
     private final int id;
+    private int logicId;
     private double x;
     private double y;
     private double speed;
     private double angle;
+    private boolean collisionWithCenterHasHappened;
     private final double radius;
     private final double mass;
     private final double desiredAngle;
@@ -26,6 +29,8 @@ public class Particle {
         this.mass = mass;
         this.neighbors = new ArrayList<>();
         this.desiredAngle = random() * 2 * PI;
+        collisionWithCenterHasHappened = false;
+        logicId = id;
     }
     public static Particle cloneOf(Particle p) {
         return new Particle(p.id, p.x, p.y, p.speed, p.angle, p.radius, p.mass);
@@ -40,6 +45,18 @@ public class Particle {
     public List<Particle> neighbors() { return neighbors; }
     public int neighborCount() { return neighbors.size(); }
     public double getMass() { return mass; }
+
+    public boolean getCollisionWithCenterHasHappened() { return collisionWithCenterHasHappened; }
+    public void setCollisionWithCenterHasHappened() {
+        collisionWithCenterHasHappened = true;
+    }
+    private void resetCollisionWithCenterHasHappened() {
+        collisionWithCenterHasHappened = false;
+    }
+    public void changeId (int newId) {
+        logicId = newId;
+        resetCollisionWithCenterHasHappened();
+    }
 
     public boolean addNeighbor(Particle neighbor) {
         if (neighbor == null || neighbor.id == this.id) return false;
@@ -72,7 +89,7 @@ public class Particle {
 
     /** CSV: id,x,y,vx,vy,angle */
     public String toCsvRow() {
-        return String.format(Locale.US,"%d,%f,%f,%f,%f,%f\n", id, x, y, vx(), vy(), radius);
+        return String.format(Locale.US,"%d,%f,%f,%f,%f,%f\n", logicId, x, y, vx(), vy(), radius);
     }
 
 
@@ -131,4 +148,15 @@ public class Particle {
         setAngle(atan2(vy, vx));
     }
 
+    public int getLogicId() {
+        return logicId;
+    }
+
+    public boolean overlapsWithParticle(Particle other) {
+        if (other == null || other.equals(this)) return false;
+        double dx = this.x - other.x;
+        double dy = this.y - other.y;
+        double r  = this.radius + other.radius;
+        return dx * dx + dy * dy <= r * r;
+    }
 }

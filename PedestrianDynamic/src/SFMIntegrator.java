@@ -1,7 +1,10 @@
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 public final class SFMIntegrator {
+
+    private static int maxN;
 
     /** Inicializa los coeficientes del método Gear-5 para todas las partículas */
     public static void initGear(List<Particle> particles,
@@ -39,6 +42,7 @@ public final class SFMIntegrator {
             Arrays.fill(r[0][k], 0.0);
             Arrays.fill(r[1][k], 0.0);
         }
+        maxN = N;
     }
 
     /** Un paso del integrador Gear-5 (basado en diap. de teórica y TP previos) */
@@ -54,6 +58,12 @@ public final class SFMIntegrator {
         final double C3 = GearCoefficients.C3;
         final double C4 = GearCoefficients.C4;
         final double C5 = GearCoefficients.C5;
+
+        int[] kxOld = new int[N], kyOld = new int[N];
+        for (int i = 1; i < N; i++) {
+            kxOld[i] = (int)Math.floor(r[0][0][i] / boardSize);
+            kyOld[i] = (int)Math.floor(r[1][0][i] / boardSize);
+        }
 
         // --- PREDICTOR ---
         for (int i = 1; i < N; i++) {
@@ -113,6 +123,13 @@ public final class SFMIntegrator {
                 r[d][3][i] = p[d][3][i] + C3 * 6.0 * R2 * invDt3;
                 r[d][4][i] = p[d][4][i] + C4 * 24.0 * R2 * invDt4;
                 r[d][5][i] = p[d][5][i] + C5 * 120.0 * R2 * invDt5;
+            }
+
+            int kxNew = (int)Math.floor(r[0][0][i] / boardSize);
+            int kyNew = (int)Math.floor(r[1][0][i] / boardSize);
+            boolean exited = (kxNew != kxOld[i]) || (kyNew != kyOld[i]);
+            if (exited) {
+                particles.get(i).changeId(++maxN);
             }
 
             // Actualizar partícula
