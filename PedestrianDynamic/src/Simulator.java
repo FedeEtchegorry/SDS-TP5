@@ -17,16 +17,19 @@ public class Simulator {
     private final Path outputPath;
 
 
-    public Simulator(double L, ArrayList<Particle> particleList, double deltaT, Path outputPath, int maxT) throws IOException {
+    public Simulator(
+      double L, ArrayList<Particle> particleList, double deltaT, Path outputPath, int maxT, double writeInterval
+    ) throws IOException {
         this.grid = new Grid(L, 0,particleList.size(), particleList, true);
         this.particles = particleList;
         this.deltaT = deltaT;
         this.maxT = maxT;
-        this.writeInterval = 0.1;
+        this.writeInterval = writeInterval;
         this.outputPath=outputPath;
         executeSimulation();
 
     }
+
     public void executeSimulation() throws IOException {
         Path analysisPath = Path.of(outputPath.toString().replace(".csv", "_collisions.csv"));
         try (OutputWriter out = OutputWriter.open(outputPath);
@@ -66,8 +69,10 @@ public class Simulator {
 
 
     public static void main(String[] args) throws IOException {
-        if (args.length != 7) {
-            throw new IllegalArgumentException("Error: Parameters should be: N L iterations inputDir outputDir maxT deltaT");
+        if (args.length != 8) {
+            throw new IllegalArgumentException(
+              "Error: Parameters should be: N L iterations inputDir outputDir maxT deltaT writeInterval"
+            );
         }
         int N = Integer.parseInt(args[0]);
         double L = Double.parseDouble(args[1]);
@@ -76,8 +81,11 @@ public class Simulator {
         String outputDir = args[4];
         int maxT = Integer.parseInt(args[5]);
         double deltaT = Double.parseDouble(args[6]);
-        if (N <= 0 || L <= 0 || iterations <= 0 || maxT <= 0 || deltaT<=0 || inputDir.isEmpty() || outputDir.isEmpty()) {
-            throw new IllegalArgumentException("Error: Parameters should be: N L iterations inputDir outputDir maxT deltaT");
+        double writeInterval = Double.parseDouble(args[7]);
+        if (N <= 0 || L <= 0 || iterations <= 0 || maxT <= 0 || deltaT<=0 || writeInterval <= 0 || inputDir.isEmpty() || outputDir.isEmpty()) {
+            throw new IllegalArgumentException(
+              "Error: Parameters should be: N L iterations inputDir outputDir maxT deltaT writeInterval"
+            );
         }
         for (int i = 0; i < iterations; i++) {
             String inputPath = "%s/N%04d/input_N%04d_%04d.csv".formatted(inputDir, N, N, i);
@@ -87,7 +95,7 @@ public class Simulator {
             Path directory = Files.createDirectories(Path.of(outputDir, "N_" + N + "_" + L_dir));
             Path fileName = Path.of(directory + String.format("/output_N%d_%s_t%d_%s.csv", N, L_dir, maxT, String.format("%04d", i)));
             System.out.printf("\nStarting iteration %d/%d...\n", i + 1, iterations);
-            Simulator s = new Simulator(L, particles, deltaT,fileName, maxT);
+            Simulator s = new Simulator(L, particles, deltaT,fileName, maxT, writeInterval);
             System.out.println("\nIteration " + (i + 1) + " completed.");
         }
     }
