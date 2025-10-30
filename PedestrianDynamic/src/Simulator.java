@@ -39,12 +39,12 @@ public class Simulator {
 
             while (t<maxT)  {
                 if (t>=nextWriteTime){
-                    List<Particle> particlesThatClashedFixedParticles = getParticlesThatClashedFixedParticle(particles);
                     out.writeStep(particles, t);
-                    analysisOut.writeCollisionWithCenterParticle(particlesThatClashedFixedParticles, t);
                     nextWriteTime+=writeInterval;
                 }
                 grid.findNeighbors();
+                List<Particle> particlesThatClashedFixedParticles = getParticlesThatClashedFixedParticle(particles);
+                analysisOut.writeCollisionWithCenterParticle(particlesThatClashedFixedParticles, t);
                 SFMIntegrator.updateParticlesGear5(particles, deltaT, gearR, gearP, grid.getL());
 
                 t+=deltaT;
