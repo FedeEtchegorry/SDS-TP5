@@ -33,7 +33,7 @@ public class Simulator {
             double[][][] gearR = new double[2][][];
             double[][][] gearP = new double[2][][];
 
-            SFMIntegrator.initGear(particles, deltaT, gearR, gearP);
+            SFMIntegrator.initGear(particles, gearR, gearP, grid.getL());
 
             while (t<maxT)  {
                 if (t>=nextWriteTime){

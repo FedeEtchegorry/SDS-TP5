@@ -13,7 +13,7 @@ public final class SFM {
         throw new IllegalStateException(this.getClass().getName() + " cannot be instantiated.");
     }
 
-    public static double[][] force(List<Particle> particles) {
+    public static double[][] force(List<Particle> particles, double L) {
 
         double[][] f = new double[particles.size()][2];
 
@@ -21,7 +21,7 @@ public final class SFM {
             for (Particle p2 : p1.neighbors()) {
                 if (p1.equals(p2)) continue;
 
-                f[p1.getId()] = contactForce(p1, p2);
+                f[p1.getId()] = contactForce(p1, p2, L);
             }
 
             double[] drivingF = drivingForce(p1);
@@ -32,13 +32,16 @@ public final class SFM {
         return f;
     }
 
-    private static double[] contactForce(Particle i, Particle j) {
+    private static double[] contactForce(Particle i, Particle j, double L) {
         double dx = j.x() - i.x();
         double dy = j.y() - i.y();
+
+        // --- Ajuste por bordes periódicos ---
+        if (Math.abs(dx) > L / 2) dx -= Math.signum(dx) * L;
+        if (Math.abs(dy) > L / 2) dy -= Math.signum(dy) * L;
+
         double dij = Math.sqrt(dx * dx + dy * dy);
-        if (dij == 0) {
-            return new double[]{0, 0};
-        }
+//        if (dij == 0) return new double[]{0, 0}; // evita división por cero
 
         double nx = dx / dij;
         double ny = dy / dij;
@@ -46,9 +49,7 @@ public final class SFM {
         double ty = nx;
 
         double overlap = i.radius() + j.radius() - dij;
-        if (overlap <= 0) return new double[]{0, 0}; // no hay contacto
-
-        double g = overlap; // g(x) = max(0, x)
+        if (overlap <= 0) return new double[]{0, 0};
 
         // Velocidades
         double vix = cos(i.getAngle()) * i.getSpeed();
@@ -61,14 +62,20 @@ public final class SFM {
         double deltaVt = dvx * tx + dvy * ty;
 
         // Fuerzas normal y tangencial
-        double fn = -KN * g;
-        double ft = KT * g * deltaVt;
+        double fn = -KN * overlap;
+        double ft = KT * overlap * deltaVt;
+
+//        if (i.getId() == 0 || j.getId() == 0) {
+//            fn *= 50;  // colisión más rígida
+//            ft = 0;    // sin fricción
+//        }
 
         double fx = fn * nx + ft * tx;
         double fy = fn * ny + ft * ty;
 
         return new double[]{fx, fy};
     }
+
 
     private static double[] drivingForce(Particle i) {
         double desiredVx = VD * cos(i.getDesiredAngle());

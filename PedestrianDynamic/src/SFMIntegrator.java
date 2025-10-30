@@ -4,8 +4,8 @@ import java.util.List;
 public final class SFMIntegrator {
 
     /** Inicializa los coeficientes del método Gear-5 para todas las partículas */
-    public static void initGear(List<Particle> particles, double dt,
-                                double[][][] r, double[][][] p) {
+    public static void initGear(List<Particle> particles,
+                                double[][][] r, double[][][] p, double L) {
         int N = particles.size();
         // r[dim][k][i] → dim={0:x,1:y}, k=0..5
         r[0] = new double[6][N];
@@ -25,7 +25,7 @@ public final class SFMIntegrator {
         }
 
         // Aceleraciones iniciales = F/m
-        double[][] forces = SFM.force(particles);
+        double[][] forces = SFM.force(particles, L);
         for (int i = 1; i < N; i++) {
             Particle pi = particles.get(i);
             double fx = forces[i][0];
@@ -82,7 +82,7 @@ public final class SFMIntegrator {
         }
 
         // --- EVALUAR NUEVAS FUERZAS ---
-        double[][] F = SFM.force(particles);
+        double[][] F = SFM.force(particles, boardSize);
         double[] R2x = new double[N];
         double[] R2y = new double[N];
 
