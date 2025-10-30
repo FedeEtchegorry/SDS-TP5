@@ -51,7 +51,7 @@ def animate_simulation(file_path, L=6.0, scale=350, save=False):
         for c, p in zip(circles, particles):
             _, x, y, _, _, r = p
             c.center = (x, y)
-            c.radius = r * 1.3  # las hace un poco más gorditas visualmente
+            c.radius = r   # las hace un poco más gorditas visualmente
         time_text.set_text(f"t = {time:.2f} s")
         return circles + [time_text]
 
@@ -65,4 +65,4 @@ def animate_simulation(file_path, L=6.0, scale=350, save=False):
 
 
 if __name__ == "__main__":
-    animate_simulation("./outputs/N_100_L6.000/output_N100_L6.000_t5_0000.csv", L=6.0)
+    animate_simulation("./PedestrianDynamic/outputs/N_10_L6.000/output_N10_L6.000_t20_0000.csv", L=6.0)

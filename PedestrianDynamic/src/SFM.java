@@ -9,6 +9,10 @@ public final class SFM {
     private static final double TAU = 0.5;    // [s] tiempo de relajación
     private static final double VD = 1.7;     // [m/s] velocidad deseada
 
+    private SFM() {
+        throw new IllegalStateException(this.getClass().getName() + " cannot be instantiated.");
+    }
+
     public static double[][] force(List<Particle> particles) {
 
         double[][] f = new double[particles.size()][2];
@@ -20,7 +24,7 @@ public final class SFM {
                 f[p1.getId()] = contactForce(p1, p2);
             }
 
-            double [] drivingF = drivingForce(p1);
+            double[] drivingF = drivingForce(p1);
             f[p1.getId()][0] += drivingF[0];
             f[p1.getId()][1] += drivingF[1];
         }
@@ -31,8 +35,10 @@ public final class SFM {
     private static double[] contactForce(Particle i, Particle j) {
         double dx = j.x() - i.x();
         double dy = j.y() - i.y();
-        double dij = hypot(dx, dy);
-        if (dij == 0) return new double[]{0, 0};
+        double dij = Math.sqrt(dx * dx + dy * dy);
+        if (dij == 0) {
+            return new double[]{0, 0};
+        }
 
         double nx = dx / dij;
         double ny = dy / dij;
@@ -75,9 +81,5 @@ public final class SFM {
         double fy = i.getMass() * ((desiredVy - viy) / TAU);
 
         return new double[]{fx, fy};
-    }
-
-    private SFM() {
-        throw new IllegalStateException(this.getClass().getName() + " cannot be instantiated.");
     }
 }

@@ -17,7 +17,7 @@ public class Simulator {
 
 
     public Simulator(double L, ArrayList<Particle> particleList, double deltaT, Path outputPath, int maxT) throws IOException {
-        this.grid = new Grid(L, particleList.getFirst().radius()*2,particleList.size(), particleList, true);
+        this.grid = new Grid(L, 0,particleList.size(), particleList, true);
         this.particles = particleList;
         this.deltaT = deltaT;
         this.maxT = maxT;
