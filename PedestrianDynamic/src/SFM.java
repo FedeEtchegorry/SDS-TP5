@@ -65,10 +65,10 @@ public final class SFM {
         double fn = -KN * overlap;
         double ft = KT * overlap * deltaVt;
 
-//        if (i.getId() == 0 || j.getId() == 0) {
-//            fn *= 50;  // colisión más rígida
-//            ft = 0;    // sin fricción
-//        }
+        if (i.getId() == 0 || j.getId() == 0) {
+            fn *= 50;  // colisión más rígida
+            ft = 0;    // sin fricción
+        }
 
         double fx = fn * nx + ft * tx;
         double fy = fn * ny + ft * ty;
