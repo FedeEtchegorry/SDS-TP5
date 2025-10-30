@@ -3,3 +3,8 @@ out/*
 PedestrianDynamic/inputs/*
 PedestrianDynamic/outputs/*
 PedestrianDynamic/PedestrianDynamic.iml
+inputs/
+outputs/
+.classes/
+.java_saves.txt
+output-parsing/
