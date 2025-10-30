@@ -38,7 +38,7 @@ public class ParticlesGenerator {
         List<Particle> particles = new ArrayList<>();
 
     // Obstáculo:
-        Particle obstacle = new Particle(0, boardSize / 2, boardSize / 2, 0.0, 0.0, Grid.OBSTACLE_RADIUS, mass);
+        Particle obstacle = new Particle(0, boardSize / 2, boardSize / 2, 0.0, 0.0, Grid.OBSTACLE_RADIUS, mass, 0.0);
         String center_particle_string = String.format(Locale.US,
                 "%d,%.17g,%.17g,%.17g,%.17g,%.17g,%.5f%n",
                 obstacle.id(), obstacle.x(), obstacle.y(), obstacle.getSpeed(), obstacle.getAngle(), obstacle.getRadius(), obstacle.getMass());
@@ -49,6 +49,7 @@ public class ParticlesGenerator {
         for (int i = 1; i <= particleCount; i++) {
             double radius = rMin + Math.random() * (rMax - rMin);
             double angle = Math.random() * 2 * Math.PI;
+            double desiredAngle = Math.random() * 2 * Math.PI;
             double x, y;
             Particle p;
 
@@ -58,7 +59,7 @@ public class ParticlesGenerator {
                 x = Math.random() * (boardSize - 2 * radius) + radius;
                 y = Math.random() * (boardSize - 2 * radius) + radius;
 
-                p = new Particle(i, x, y, speed, angle, radius, mass);
+                p = new Particle(i, x, y, speed, angle, radius, mass, desiredAngle);
                 valid = true;
 
                 for (Particle other : particles) {

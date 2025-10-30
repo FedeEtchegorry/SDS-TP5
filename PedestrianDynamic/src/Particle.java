@@ -19,7 +19,7 @@ public class Particle {
 
     private final List<Particle> neighbors;
 
-    public Particle(int id, double x, double y, double speed, double angle, double radius, double mass) {
+    public Particle(int id, double x, double y, double speed, double angle, double radius, double mass, double desiredAngle) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -28,12 +28,12 @@ public class Particle {
         this.radius = radius;
         this.mass = mass;
         this.neighbors = new ArrayList<>();
-        this.desiredAngle = random() * 2 * PI;
+        this.desiredAngle = desiredAngle;
         collisionWithCenterHasHappened = false;
         logicId = id;
     }
     public static Particle cloneOf(Particle p) {
-        return new Particle(p.id, p.x, p.y, p.speed, p.angle, p.radius, p.mass);
+        return new Particle(p.id, p.x, p.y, p.speed, p.angle, p.radius, p.mass, p.desiredAngle);
     }
 
     public int id() { return id; }
