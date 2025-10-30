@@ -67,7 +67,7 @@ public class Simulator {
 
     public static void main(String[] args) throws IOException {
         if (args.length != 7) {
-            throw new IllegalArgumentException("Wrong number of arguments");
+            throw new IllegalArgumentException("Error: Parameters should be: N L iterations inputDir outputDir maxT deltaT");
         }
         int N = Integer.parseInt(args[0]);
         double L = Double.parseDouble(args[1]);
@@ -77,12 +77,11 @@ public class Simulator {
         int maxT = Integer.parseInt(args[5]);
         double deltaT = Double.parseDouble(args[6]);
         if (N <= 0 || L <= 0 || iterations <= 0 || maxT <= 0 || deltaT<=0 || inputDir.isEmpty() || outputDir.isEmpty()) {
-            System.out.println("Error: Parameters should be: N L iterations inputDir outputDir maxT deltaT");
-            return;
+            throw new IllegalArgumentException("Error: Parameters should be: N L iterations inputDir outputDir maxT deltaT");
         }
         for (int i = 0; i < iterations; i++) {
-            InputParser parser = new InputParser(inputDir + "/N" + String.format("%04d", N) +
-                    "/input_N" + String.format("%04d", N) + "_" + String.format("%04d", i) + ".csv", N);
+            String inputPath = "%s/N%04d/input_N%04d_%04d.csv".formatted(inputDir, N, N, i);
+            InputParser parser = new InputParser(inputPath, N);
             ArrayList<Particle> particles = parser.parseInputs();
             String L_dir = String.format(Locale.US, "L%.3f", L);
             Path directory = Files.createDirectories(Path.of(outputDir, "N_" + N + "_" + L_dir));

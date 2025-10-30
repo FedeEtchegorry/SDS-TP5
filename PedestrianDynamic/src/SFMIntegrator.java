@@ -7,8 +7,7 @@ public final class SFMIntegrator {
     private static int maxN;
 
     /** Inicializa los coeficientes del método Gear-5 para todas las partículas */
-    public static void initGear(List<Particle> particles,
-                                double[][][] r, double[][][] p, double L) {
+    public static void initGear(List<Particle> particles, double[][][] r, double[][][] p, double L) {
         int N = particles.size();
         // r[dim][k][i] → dim={0:x,1:y}, k=0..5
         r[0] = new double[6][N];
