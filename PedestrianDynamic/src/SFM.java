@@ -11,19 +11,21 @@ public final class SFM {
 
     public static double[][] force(List<Particle> particles) {
 
-        double[] fx = new double[particles.size()];
-        double[] fy = new double[particles.size()];
+        double[][] f = new double[particles.size()][2];
 
         for (Particle p1 : particles.subList(1, particles.size())) {
             for (Particle p2 : p1.neighbors()) {
                 if (p1.equals(p2)) continue;
-                fx[p1.getId()] += contactForce(particles.get(p1.getId()), particles.get(p2.getId()))[0];
-                fy[p1.getId()] += contactForce(particles.get(p1.getId()), particles.get(p2.getId()))[1];
+
+                f[p1.getId()] = contactForce(p1, p2);
             }
-            fx[p1.getId()] += drivingForce(particles.get(p1.getId()))[0];
+
+            double [] drivingF = drivingForce(p1);
+            f[p1.getId()][0] += drivingF[0];
+            f[p1.getId()][1] += drivingF[1];
         }
 
-        return new double[][]{fx, fy};
+        return f;
     }
 
     private static double[] contactForce(Particle i, Particle j) {
@@ -53,7 +55,7 @@ public final class SFM {
         double deltaVt = dvx * tx + dvy * ty;
 
         // Fuerzas normal y tangencial
-        double fn = KN * g;
+        double fn = -KN * g;
         double ft = KT * g * deltaVt;
 
         double fx = fn * nx + ft * tx;

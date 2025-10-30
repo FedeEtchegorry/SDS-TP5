@@ -28,8 +28,8 @@ public final class SFMIntegrator {
         double[][] forces = SFM.force(particles);
         for (int i = 1; i < N; i++) {
             Particle pi = particles.get(i);
-            double fx = forces[0][i];
-            double fy = forces[1][i];
+            double fx = forces[i][0];
+            double fy = forces[i][1];
             r[0][2][i] = fx / pi.getMass();
             r[1][2][i] = fy / pi.getMass();
         }
@@ -90,8 +90,8 @@ public final class SFMIntegrator {
             Particle pi = particles.get(i);
             double axPred = p[0][2][i];
             double ayPred = p[1][2][i];
-            double axReal = F[0][i] / pi.getMass();
-            double ayReal = F[1][i] / pi.getMass();
+            double axReal = F[i][0] / pi.getMass();
+            double ayReal = F[i][1] / pi.getMass();
             R2x[i] = 0.5 * (axReal - axPred) * dt2;
             R2y[i] = 0.5 * (ayReal - ayPred) * dt2;
         }
