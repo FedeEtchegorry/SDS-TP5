@@ -40,8 +40,8 @@ public class ParticlesGenerator {
     // Obstáculo:
         Particle obstacle = new Particle(0, boardSize / 2, boardSize / 2, 0.0, 0.0, Grid.OBSTACLE_RADIUS, mass, 0.0);
         String center_particle_string = String.format(Locale.US,
-                "%d,%.17g,%.17g,%.17g,%.17g,%.17g,%.5f%n",
-                obstacle.id(), obstacle.x(), obstacle.y(), obstacle.getSpeed(), obstacle.getAngle(), obstacle.getRadius(), obstacle.getMass());
+                "%d,%.17g,%.17g,%.17g,%.17g,%.17g,%.5f,%.17g%n",
+                obstacle.id(), obstacle.x(), obstacle.y(), obstacle.getSpeed(), obstacle.getAngle(), obstacle.getRadius(), obstacle.getMass(), obstacle.getDesiredAngle());
         Files.write(file.toPath(), center_particle_string.getBytes(), StandardOpenOption.APPEND);
         particles.add(obstacle);
 
@@ -81,8 +81,8 @@ public class ParticlesGenerator {
             particles.add(p);
 
             String particleStr = String.format(Locale.US,
-                    "%d,%.17g,%.17g,%.17g,%.17g,%.17g,%.5f%n",
-                    i, x, y, speed, angle, radius, mass);
+                    "%d,%.17g,%.17g,%.17g,%.17g,%.17g,%.5f,%.17g%n",
+                    i, x, y, speed, angle, radius, mass, desiredAngle);
             Files.write(file.toPath(), particleStr.getBytes(), StandardOpenOption.APPEND);
         }
 

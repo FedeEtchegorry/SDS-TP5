@@ -16,7 +16,7 @@ public class InputParser {
             List<String> lines = Files.readAllLines(Path.of(inputPath));
             for (String line : lines) {
                 String[] parts = line.split(",");
-                if (parts.length != 7) {
+                if (parts.length != 8) {
                     throw new IllegalArgumentException("Invalid input format");
                 }
                 int id = Integer.parseInt(parts[0]);
@@ -26,7 +26,8 @@ public class InputParser {
                 double angle = Double.parseDouble(parts[4]);
                 double radius = Double.parseDouble(parts[5]);
                 double mass = Double.parseDouble(parts[6]);
-                Particle particle = new Particle(id, x, y, v, angle, radius, mass);
+                double desiredAngle = Double.parseDouble(parts[7]);
+                Particle particle = new Particle(id, x, y, v, angle, radius, mass, desiredAngle);
                 particles.add(particle);
             }
             if (particles.size() != particles_amount + 1) { // - 1 por el obstáculo
