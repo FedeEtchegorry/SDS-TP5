@@ -1,5 +1,6 @@
 import java.util.List;
-
+import java.util.concurrent.ForkJoinPool;
+import java.util.stream.IntStream;
 import static java.lang.Math.*;
 
 public final class SFM {
@@ -14,22 +15,48 @@ public final class SFM {
     }
 
     public static double[][] force(List<Particle> particles, double L) {
+        int n = particles.size();
+        double[][] f = new double[n][2];
 
-        double[][] f = new double[particles.size()][2];
-// [0, 1, 2, 3, 4, 5]
-// [6, 1, 1, 1, 1, 1]
-        for (Particle p1 : particles.subList(1, particles.size())) {
-            for (Particle p2 : p1.neighbors()) {
-                if (p1.equals(p2)) continue;
+        int availableThreads = Runtime.getRuntime().availableProcessors();
+        ForkJoinPool pool = new ForkJoinPool(availableThreads);
 
-                double[] contactForce = contactForce(p1, p2, L);
-                f[p1.getId()][0] += contactForce[0];
-                f[p1.getId()][1] += contactForce[1];
-            }
+        try {
+            pool.submit(() ->
+                    IntStream.range(1, n).parallel().forEach(i -> {
+                        Particle p1 = particles.get(i);
 
-            double[] drivingF = drivingForce(p1);
-            f[p1.getId()][0] += drivingF[0];
-            f[p1.getId()][1] += drivingF[1];
+                        double fx = 0, fy = 0;
+
+                        for (Particle p2 : p1.neighbors()) {
+                            if (p1.compareTo(p2) >= 0 && p1.notObstacle() && p2.notObstacle()) continue;
+
+                            double[] contact = contactForce(p1, p2, L);
+
+                            fx += contact[0];
+                            fy += contact[1];
+
+                            // suma opuesta en p2 (sin tocar el obstáculo id=0)
+                            if (p2.notObstacle()) {
+                                synchronized (f[p2.getId()]) {
+                                    f[p2.getId()][0] -= contact[0];
+                                    f[p2.getId()][1] -= contact[1];
+                                }
+                            }
+                        }
+
+                        double[] driving = drivingForce(p1);
+                        fx += driving[0];
+                        fy += driving[1];
+
+                        f[p1.getId()][0] += fx;
+                        f[p1.getId()][1] += fy;
+                    })
+            ).get();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            pool.shutdown();
         }
 
         return f;

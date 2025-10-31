@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.Random;
 
 import static java.lang.Math.*;
 
@@ -155,6 +154,10 @@ public class Particle implements Comparable<Particle> {
 
     public int getLogicId() {
         return logicId;
+    }
+
+    public boolean notObstacle() {
+        return getId() != 0;
     }
 
     public boolean overlapsWithParticle(Particle other) {

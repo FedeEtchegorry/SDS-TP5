@@ -95,8 +95,21 @@ public class Simulator {
             Path directory = Files.createDirectories(Path.of(outputDir, "N_" + N + "_" + L_dir));
             Path fileName = Path.of(directory + String.format("/output_N%d_%s_t%d_%s.csv", N, L_dir, maxT, String.format("%04d", i)));
             System.out.printf("\nStarting iteration %d/%d...\n", i + 1, iterations);
-            Simulator s = new Simulator(L, particles, deltaT,fileName, maxT, writeInterval);
-            System.out.println("\nIteration " + (i + 1) + " completed.");
+
+            long startTime = System.nanoTime(); // ⏱ inicio
+
+                Simulator s = new Simulator(L, particles, deltaT, fileName, maxT, writeInterval);
+
+            long endTime = System.nanoTime();   // ⏱ fin
+
+            double elapsedSeconds = (endTime - startTime) / 1_000_000_000.0;
+
+            int hours = (int) (elapsedSeconds / 3600);
+            int minutes = (int) ((elapsedSeconds % 3600) / 60);
+            double seconds = elapsedSeconds % 60;
+
+            System.out.printf("Iteration %d completed in %d h %d min %.2f s.%n", i + 1, hours, minutes, seconds);
+
         }
     }
 }
