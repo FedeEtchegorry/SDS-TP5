@@ -16,7 +16,8 @@ public final class SFM {
     public static double[][] force(List<Particle> particles, double L) {
 
         double[][] f = new double[particles.size()][2];
-
+// [0, 1, 2, 3, 4, 5]
+// [6, 1, 1, 1, 1, 1]
         for (Particle p1 : particles.subList(1, particles.size())) {
             for (Particle p2 : p1.neighbors()) {
                 if (p1.equals(p2)) continue;
@@ -67,10 +68,10 @@ public final class SFM {
         double fn = -KN * overlap;
         double ft = KT * overlap * deltaVt;
 
-        if (i.getId() == 0 || j.getId() == 0) {
-            fn *= 50;  // colisión más rígida
-            ft = 0;    // sin fricción
-        }
+//        if (i.getId() == 0 || j.getId() == 0) {
+//            fn *= 50;  // colisión más rígida
+//            ft = 0;    // sin fricción
+//        }
 
         double fx = fn * nx + ft * tx;
         double fy = fn * ny + ft * ty;

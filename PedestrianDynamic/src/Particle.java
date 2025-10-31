@@ -5,7 +5,7 @@ import java.util.Random;
 
 import static java.lang.Math.*;
 
-public class Particle {
+public class Particle implements Comparable<Particle> {
     private final int id;
     private int logicId;
     private double x;
@@ -100,6 +100,11 @@ public class Particle {
     @Override
     public boolean equals(Object obj) {
         return obj instanceof Particle && getId() == ((Particle) obj).getId();
+    }
+
+    @Override
+    public int compareTo(Particle o) {
+        return Integer.compare(getId(), o.getId());
     }
 
     public double getDesiredAngle() {
