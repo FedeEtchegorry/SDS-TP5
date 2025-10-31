@@ -21,7 +21,9 @@ public final class SFM {
             for (Particle p2 : p1.neighbors()) {
                 if (p1.equals(p2)) continue;
 
-                f[p1.getId()] = contactForce(p1, p2, L);
+                double[] contactForce = contactForce(p1, p2, L);
+                f[p1.getId()][0] += contactForce[0];
+                f[p1.getId()][1] += contactForce[1];
             }
 
             double[] drivingF = drivingForce(p1);
