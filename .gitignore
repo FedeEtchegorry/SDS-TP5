@@ -1,5 +1,6 @@
 out/*
 .idea/*
+PedestrianDynamic/.idea/
 PedestrianDynamic/inputs/*
 PedestrianDynamic/outputs/*
 PedestrianDynamic/PedestrianDynamic.iml
@@ -8,3 +9,4 @@ outputs/
 .classes/
 .java_saves.txt
 output-parsing/
+peatones.iml
