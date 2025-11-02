@@ -93,15 +93,14 @@ def plot_average_contacts(folder_path, output_path=None):
     #  GRAFICAR RESULTADO
     # ==========================================================
     plt.figure(figsize=(8,5))
-    plt.plot(common_time, mean_curve, color='tab:blue', lw=2, label='Promedio')
+    plt.plot(common_time, mean_curve, color='tab:blue', lw=2, label='Datos')
     plt.fill_between(common_time,
                      mean_curve - std_curve,
                      mean_curve + std_curve,
-                     color='tab:blue', alpha=0.25, label='± Desvío estándar')
+                     color='tab:blue', alpha=0.25, label='Desvío estándar')
 
-    plt.xlabel("Tiempo [s]")
+    plt.xlabel("Tiempo (s)")
     plt.ylabel("Contactos únicos acumulados")
-    plt.title(f"Contactos únicos promedio – {os.path.basename(folder_path)}")
     plt.grid(True, linestyle="--", alpha=0.5)
     plt.legend()
     plt.tight_layout()
