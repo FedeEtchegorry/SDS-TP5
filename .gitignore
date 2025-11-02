@@ -8,5 +8,5 @@ inputs/
 outputs/
 .classes/
 .java_saves.txt
-output-parsing/
 peatones.iml
+perf/
