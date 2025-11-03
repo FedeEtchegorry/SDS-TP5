@@ -35,11 +35,21 @@ def build_unique_contact_curve(events):
             unique_counts.append(total)
     return np.array(times), np.array(unique_counts)
 
-def compute_slope(time, contacts, fraction=0.3):
-    """Ajusta una recta al último tramo de la curva acumulada."""
-    if len(time) < 5:
+
+def compute_slope(time, contacts, t_start=10.0, min_points=5):
+    """Ajusta una recta a partir de t >= t_start (por defecto 10 s)."""
+    time = np.asarray(time)
+    contacts = np.asarray(contacts)
+
+    if len(time) < min_points:
         return np.nan, np.nan
-    n0 = int(len(time) * (1 - fraction))
+
+    # primer índice con t >= t_start
+    n0 = np.searchsorted(time, t_start, side='left')
+    
+    if len(time) - n0 < min_points:
+        return np.nan, np.nan
+
     slope, _, _, _, std_err = linregress(time[n0:], contacts[n0:])
     return slope, std_err
 
@@ -71,7 +81,7 @@ def process_all(base_dir="outputs"):
             try:
                 events = parse_collision_file(os.path.join(folder, f))
                 time, contacts = build_unique_contact_curve(events)
-                slope, _ = compute_slope(time, contacts)
+                slope, _ = compute_slope(time, contacts, t_start=10.0)
                 slopes.append(slope)
                 plt.plot(time, contacts, label=f"{subdir}")
             except Exception as e:
@@ -102,15 +112,14 @@ def process_all(base_dir="outputs"):
 def plot_Q_vs_phi(results, output="images/Q_vs_phi.png"):
     phi, Q, Qerr = np.array(results).T
     plt.errorbar(phi, Q, yerr=Qerr, fmt='o-', capsize=4)
-    plt.xlabel("Fracción de área ocupada ϕ")
-    plt.ylabel("Pendiente Q [1/s]")
-    plt.title("Scanning rate Q vs ϕ (SFM)")
+    plt.xlabel(r"Fracción de área ocupada $\phi$", fontsize=14)
+    plt.ylabel(r"Pendiente $\mathit{Q}$ (s$^{-1}$)", fontsize=14)
     plt.grid(True)
     plt.tight_layout()
     plt.savefig(output, dpi=300)
     print(f"📈 Figura guardada en {output}")
 
 if __name__ == "__main__":
-    results = process_all("outputs/pendiente")
+    results = process_all("PedestrianDynamic/OutputsOriginales")
     if results:
         plot_Q_vs_phi(results)
