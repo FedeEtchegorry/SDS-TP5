@@ -27,21 +27,48 @@ def read_simulation_output(path):
     return steps
 
 
+def read_collisions(collisions_path):
+    """Devuelve un dict {pid: tiempo_primera_colision}."""
+    collision_times = {}
+    if not os.path.exists(collisions_path):
+        print(f"[WARN] No collision file found at {collisions_path}")
+        return collision_times
+
+    with open(collisions_path, "r") as f:
+        for line in f:
+            parts = line.strip().split()
+            if len(parts) == 2:
+                t, pid = parts
+                pid = int(pid)
+                if pid == 0:
+                    continue  # ignorar el obstáculo
+                t = float(t)
+                if pid not in collision_times or t < collision_times[pid]:
+                    collision_times[pid] = t
+    print(f"[INFO] {len(collision_times)} particles collided with the obstacle.")
+    return collision_times
+
+
 def animate_simulation(
-    file_path,
-    L=6.0,
-    scale=350,
-    save=False,
-    maxT=10.0,
-    speed=1.0,
-    output_dir="animations",
+        file_path,
+        L=6.0,
+        scale=350,
+        save=False,
+        maxT=10.0,
+        speed=1.0,
+        output_dir="animations",
 ):
     steps = read_simulation_output(file_path)
     n_frames = len(steps)
 
-    # Compute playback duration (T / speed) and interval in ms
+    # Buscar archivo de colisiones asociado
+    base_name = os.path.splitext(file_path)[0]
+    collisions_path = base_name + "_collisions.csv"
+    collision_times = read_collisions(collisions_path)
+
+    # Intervalo temporal entre frames
     total_playback_time = maxT / speed
-    interval = (total_playback_time / n_frames) * 1000  # convert to milliseconds
+    interval = (total_playback_time / n_frames) * 1000  # ms
 
     print(f"[INFO] Loaded {n_frames} frames.")
     print(f"[INFO] Playback duration: {total_playback_time:.2f} s")
@@ -54,24 +81,18 @@ def animate_simulation(
     ax.set_title("Pedestrian Simulation (SFM)")
 
     time_text = ax.text(0.02, 0.95, "", transform=ax.transAxes)
-    circles = []
-    labels = []
+    circles, labels = [], []
 
-    # Initialize circles (one per particle)
+    # Inicializar círculos
     for pid, x, y, vx, vy, r in steps[0][1]:
         color = "red" if pid == 0 else "royalblue"
         c = Circle((x, y), r, color=color, alpha=0.7)
         ax.add_patch(c)
         circles.append(c)
         label = ax.text(
-            x,
-            y,
-            str(pid),
-            ha="center",
-            va="center",
-            fontsize=6,
-            color="white",
-            weight="bold",
+            x, y, str(pid),
+            ha="center", va="center",
+            fontsize=6, color="white", weight="bold",
         )
         labels.append(label)
 
@@ -85,18 +106,27 @@ def animate_simulation(
             pid, x, y, vx, vy, r = p
             c.center = (x, y)
             c.radius = r
+
+            # Colorear según colisión
+            if pid == 0:
+                c.set_color("red")  # obstáculo
+            elif pid in collision_times and time >= collision_times[pid]:
+                c.set_color("limegreen")  # ya colisionó
+            else:
+                c.set_color("royalblue")  # aún no colisionó
+
             label.set_position((x, y))
         time_text.set_text(f"t = {time:.2f} s")
         return circles + labels + [time_text]
 
     ani = animation.FuncAnimation(
-        fig, update, frames=n_frames, init_func=init, interval=interval, blit=True
+        fig, update, frames=n_frames, init_func=init,
+        interval=interval, blit=True
     )
 
     if save:
         fps = n_frames / total_playback_time if total_playback_time > 0 else 30
-        base_name = os.path.basename(file_path)
-        output_path = os.path.join(output_dir, os.path.splitext(base_name)[0] + ".mp4")
+        output_path = os.path.join(output_dir, os.path.basename(base_name) + ".mp4")
         print(f"[INFO] Saving animation to {output_path} (fps={fps:.2f})")
         ani.save(output_path, fps=fps, dpi=150)
     else:
@@ -104,34 +134,14 @@ def animate_simulation(
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Animate pedestrian simulation output."
-    )
+    parser = argparse.ArgumentParser(description="Animate pedestrian simulation output.")
     parser.add_argument("file_path", help="Path to simulation output file")
-    parser.add_argument("--L", type=float, default=6.0, help="Simulation box size")
-    parser.add_argument(
-        "--scale", type=float, default=350, help="Animation scaling factor"
-    )
-    parser.add_argument(
-        "--save",
-        action="store_true",
-        help="Save animation to MP4 instead of showing it",
-    )
-    parser.add_argument(
-        "--maxT", type=float, required=True, help="Total simulated time (s, required)"
-    )
-    parser.add_argument(
-        "--speed",
-        type=float,
-        default=1.0,
-        help="Playback speed factor (1.0 = real-time, 2.0 = double speed, etc.)",
-    )
-    parser.add_argument(
-        "--output_dir",
-        type=str,
-        default="animations",
-        help="Output directory",
-    )
+    parser.add_argument("--L", type=float, default=6.0)
+    parser.add_argument("--scale", type=float, default=350)
+    parser.add_argument("--save", action="store_true")
+    parser.add_argument("--maxT", type=float, required=True)
+    parser.add_argument("--speed", type=float, default=1.0)
+    parser.add_argument("--output_dir", type=str, default="animations")
     args = parser.parse_args()
 
     animate_simulation(
