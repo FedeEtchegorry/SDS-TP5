@@ -99,10 +99,12 @@ def plot_average_contacts(folder_path, output_path=None):
                      mean_curve + std_curve,
                      color='tab:blue', alpha=0.25, label='Desvío estándar')
 
-    plt.xlabel("Tiempo (s)")
-    plt.ylabel("Contactos únicos acumulados")
+    plt.xlabel("Tiempo (s)", fontsize=14)
+    plt.ylabel(r"Contactos únicos acumulados $N_c$", fontsize=14)
     plt.grid(True, linestyle="--", alpha=0.5)
-    plt.legend()
+    plt.axvline(x=10, color='red', linestyle='--', linewidth=1.6)
+    plt.legend(fontsize=12)
+    plt.tick_params(axis='both', labelsize=12)
     plt.tight_layout()
 
     # Guardar o mostrar
