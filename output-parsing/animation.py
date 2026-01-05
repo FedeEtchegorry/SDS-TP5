@@ -41,7 +41,7 @@ def read_collisions(collisions_path):
                 t, pid = parts
                 pid = int(pid)
                 if pid == 0:
-                    continue  # ignorar el obstáculo
+                    continue
                 t = float(t)
                 if pid not in collision_times or t < collision_times[pid]:
                     collision_times[pid] = t
@@ -51,7 +51,7 @@ def read_collisions(collisions_path):
 
 def animate_simulation(
         file_path,
-        L=6.0,
+        L=12.0,
         scale=350,
         save=False,
         maxT=10.0,
@@ -61,12 +61,11 @@ def animate_simulation(
     steps = read_simulation_output(file_path)
     n_frames = len(steps)
 
-    # Buscar archivo de colisiones asociado
+    # Archivo de colisiones asociado
     base_name = os.path.splitext(file_path)[0]
     collisions_path = base_name + "_collisions.csv"
     collision_times = read_collisions(collisions_path)
 
-    # Intervalo temporal entre frames
     total_playback_time = maxT / speed
     interval = (total_playback_time / n_frames) * 1000  # ms
 
@@ -81,43 +80,63 @@ def animate_simulation(
     ax.set_title("Pedestrian Simulation (SFM)")
 
     time_text = ax.text(0.02, 0.95, "", transform=ax.transAxes)
-    circles, labels = [], []
 
-    # Inicializar círculos
-    for pid, x, y, vx, vy, r in steps[0][1]:
-        color = "red" if pid == 0 else "royalblue"
-        c = Circle((x, y), r, color=color, alpha=0.7)
-        ax.add_patch(c)
-        circles.append(c)
-        label = ax.text(
-            x, y, str(pid),
-            ha="center", va="center",
-            fontsize=6, color="white", weight="bold",
-        )
-        labels.append(label)
+    # Diccionario dinámico: pid → (circle, label)
+    particles_drawn = {}
 
     def init():
         time_text.set_text("")
-        return circles + labels + [time_text]
+        return [time_text]
 
     def update(frame):
         time, particles = steps[frame]
-        for c, label, p in zip(circles, labels, particles):
-            pid, x, y, vx, vy, r = p
+
+        # Actualizar o crear partículas visibles
+        current_pids = set()
+        for pid, x, y, vx, vy, r in particles:
+            current_pids.add(pid)
+
+            if pid not in particles_drawn:
+                # Crear nueva partícula
+                color = (
+                    "red" if pid == 0 else
+                    "limegreen" if pid in collision_times and time >= collision_times[pid]
+                    else "royalblue"
+                )
+                c = Circle((x, y), r, color=color, alpha=0.7)
+                ax.add_patch(c)
+                label = ax.text(
+                    x, y, str(pid),
+                    ha="center", va="center",
+                    fontsize=6, color="white", weight="bold",
+                )
+                particles_drawn[pid] = (c, label)
+
+            # Actualizar posición/color del pid existente
+            c, label = particles_drawn[pid]
             c.center = (x, y)
             c.radius = r
-
-            # Colorear según colisión
             if pid == 0:
-                c.set_color("red")  # obstáculo
+                c.set_color("red")
             elif pid in collision_times and time >= collision_times[pid]:
-                c.set_color("limegreen")  # ya colisionó
+                c.set_color("limegreen")
             else:
-                c.set_color("royalblue")  # aún no colisionó
-
+                c.set_color("royalblue")
             label.set_position((x, y))
+            label.set_text(str(pid))
+
+        # Eliminar los que ya no están en el frame actual
+        missing = set(particles_drawn.keys()) - current_pids
+        for pid in missing:
+            c, label = particles_drawn[pid]
+            c.remove()
+            label.remove()
+            del particles_drawn[pid]
+
         time_text.set_text(f"t = {time:.2f} s")
-        return circles + labels + [time_text]
+
+        visible = [obj for pair in particles_drawn.values() for obj in pair]
+        return visible + [time_text]
 
     ani = animation.FuncAnimation(
         fig, update, frames=n_frames, init_func=init,
